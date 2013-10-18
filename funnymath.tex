@@ -1,0 +1,70 @@
+\documentclass[a4paper]{minimal}
+\usepackage[english,russian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{tikz}
+
+\begin{document}
+
+\newcount\dv
+\newcount\res
+
+%% Calculates the #1 % 4
+\newcommand{\calcmod}[1]{
+\dv=#1
+\res=\the\dv
+\divide\dv by 4
+\multiply\dv by -4
+\advance\res by \the\dv
+}
+
+Программа основана на использовании формулы окружности $R = \sqrt{x^2+y^2},$ но результат работы этой программы показывает, что окружности сливаются и дают в результате устойчивые
+изображения квадратов.
+
+График ниже получен c использованием следующих итерационных формул, предложенных для построения узоров Б. Мартином из Астонского университета в Бирмингеме:
+
+$$
+\left\{\begin{aligned}
+x_i  = & y_{i-1} - sign(x_{i-1})\cdot\sqrt{\left|b\cdot x_{i-1} - c\right|},&x_0 = 0\\
+y_i  = & a - x_{i-1},&y_0 = 0
+\end{aligned}\right.
+$$
+
+При значениях констант:
+
+$$
+a = 40, b = 20, c = 100.
+$$
+
+\begin{tikzpicture}[x=1mm,y=1mm,scale=.35]
+\pgfmathsetmacro{\constA}{40}%
+\pgfmathsetmacro{\constB}{20}%
+\pgfmathsetmacro{\constC}{100}%
+\foreach[%
+	remember=\x as \xx (initially 0),
+        remember=\y as \yy (initially 0),
+        evaluate=\x using (\xx>0) ? \yy - sqrt(abs(\constB*\xx-\constC)) : \yy + sqrt(abs(\constB*\xx-\constC)),
+        evaluate=\y using \constA - \xx,
+        ] \i in {0,...,11000} {%
+	\calcmod{\i}
+	\ifnum\res=0 \fill[color=red](\x,\y) circle(1pt);
+	\fi
+	\ifnum\res=1 \fill[color=yellow](\x,\y) circle(1pt);
+	\fi
+	\ifnum\res=2 \fill[color=blue](\x,\y) circle(1pt);
+	\fi
+	\ifnum\res=3 \fill[color=black](\x,\y) circle(1pt);
+	\fi
+}%
+\end{tikzpicture}
+
+А вот эти формулы напечатаны в школьной книге с ошибкой (рисуют овал по крайней мере при $A=60$):
+
+$$
+\left\{\begin{aligned}
+x_i  = & y_{i-1} - \sin\left(x_{i-1}\right),&x_0 = 0\\
+y_i  = & a - x_{i-1},&y_0 = 0
+\end{aligned}\right.
+$$
+
+\end{document}
